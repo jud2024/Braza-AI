@@ -1,45 +1,75 @@
-<!DOCTYPE html>
 <html>
-<head>
-  <title>Gemini AI com Memória</title>
-</head>
 <body>
-  <h1>Teste do Gemini com Memória</h1>
-  <input type="text" id="inputText" placeholder="Digite sua pergunta..." />
-  <button onclick="chamarGemini()">Enviar</button>
-  <pre id="resposta"></pre>
+    <div style="max-width: 800px; margin: 20px auto; font-family: Arial, sans-serif;">
+        <h1>Ask Grok Anything</h1>
+        <div id="chat-container" style="margin: 20px 0;">
+            <div id="messages" style="height: 400px; border: 1px solid #ccc; overflow-y: auto; padding: 20px; margin-bottom: 20px; border-radius: 8px;"></div>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="user-input" 
+                    style="flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px;" 
+                    placeholder="Ask me anything...">
+                <button onclick="askQuestion()" 
+                    style="padding: 10px 20px; background: #0066cc; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    Ask
+                </button>
+            </div>
+        </div>
+    </div>
 
-  <script>
-    const historico = [];
+    <script src="https://js.puter.com/v2/"></script>
+    <script>
+        const messagesDiv = document.getElementById('messages');
+        const userInput = document.getElementById('user-input');
 
-    async function chamarGemini() {
-      const input = document.getElementById('inputText').value;
-      const respostaDiv = document.getElementById('resposta');
-      respostaDiv.textContent = 'Carregando...';
+        async function askQuestion() {
+            const question = userInput.value;
+            if (!question) return;
 
-      // Adiciona a nova entrada do usuário ao histórico
-      historico.push({ role: 'user', text: input });
+            // Add user question
+            messagesDiv.innerHTML += `
+                <div style="margin-bottom: 15px;">
+                    <strong style="color: #0066cc;">You:</strong><br>
+                    ${question}
+                </div>
+            `;
+            userInput.value = '';
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
-      const contents = historico.map(mensagem => ({
-        parts: [{ text: mensagem.text }]
-      }));
+            // Add Grok's response container
+            messagesDiv.innerHTML += `
+                <div style="margin-bottom: 15px;">
+                    <strong style="color: #009933;">Grok:</strong><br>
+                    <span id="grok-response"></span>
+                </div>
+            `;
+            const responseSpan = document.getElementById('grok-response');
 
-      const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyDh-Xemw0S2EInqFBnj-FO2ySWT1XSuY28", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ contents })
-      });
+            // Get streaming response from Grok
+            const response = await puter.ai.chat(question, {
+                model: 'openrouter:x-ai/grok-2-1212',
+                stream: true
+            });
 
-      const data = await response.json();
-      const resposta = data.candidates?.[0]?.content?.parts?.[0]?.text || "Erro ao gerar resposta.";
+            for await (const part of response) {
+                responseSpan.innerHTML += part.text;
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+        }
 
-      // Adiciona a resposta da IA ao histórico
-      historico.push({ role: 'model', text: resposta });
+        // Allow sending message with Enter key
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') askQuestion();
+        });
 
-      respostaDiv.textContent = resposta;
-    }
-  </script>
+        // Add initial greeting
+        window.onload = () => {
+            messagesDiv.innerHTML = `
+                <div style="margin-bottom: 15px;">
+                    <strong style="color: #009933;">Grok:</strong><br>
+                    Hi there! I'm Grok, your witty AI assistant. I'm here to help you with anything you'd like to know about. What's on your mind?
+                </div>
+            `;
+        };
+    </script>
 </body>
 </html>
