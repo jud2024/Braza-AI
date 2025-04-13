@@ -1,20 +1,29 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Chat GPT-4o (Puter.js)</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://js.puter.com/v2/"></script>
+  <meta charset="UTF-8">
+  <title>Chat GPT-4o (Puter.js)</title>
+  <style>
+    body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
+    #chat, #historico { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; background: #fff; max-height: 300px; overflow-y: auto; }
+    input, button { padding: 8px; margin: 5px 0; }
+    button { cursor: pointer; }
+  </style>
+  <script src="https://puter.com/static/js/puter.js"></script>
+  <script src="script.js" defer></script>
 </head>
 <body>
-    <h1>Chat GPT-4o (Puter.js)</h1>
-    <div id="messages"></div>
-    <input type="text" id="userInput" placeholder="Digite sua mensagem...">
-    <button onclick="enviarMensagem()">Enviar</button>
-    <button onclick="limparHistorico()">Limpar Histórico</button>
-    <h2>Histórico:</h2>
-    <div id="historico"></div>
 
-    <script src="script.js"></script>
+  <h2>Chat GPT-4o (Puter.js)</h2>
+
+  <div id="chat"></div>
+
+  <input type="text" id="mensagem" placeholder="Digite sua mensagem">
+  <button onclick="enviarMensagem()">Enviar</button>
+  <button onclick="limparHistorico()">Limpar Histórico</button>
+
+  <h3>Histórico:</h3>
+  <div id="historico"></div>
+
 </body>
 </html>
